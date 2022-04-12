@@ -7,7 +7,14 @@ import { PrismaClientExceptionFilter } from "./common/exceptions/prisma-client-e
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // 👈 automatically transform payloads
+      transformOptions: {
+        enableImplicitConversion: true, // 👈  transform based on TS type
+      },
+    })
+  );
 
   const config = new DocumentBuilder()
     .setTitle("NestJS Prisma Workshop")

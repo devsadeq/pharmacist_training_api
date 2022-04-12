@@ -363,6 +363,13 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
+"@devoxa/prisma-relay-cursor-connection@^2.1.0":
+  "integrity" "sha512-rtZKFXzodHYfts+ODJJ1DsDykJJjGC7fOvD+QAsm4mu+enK5rA1Ezw+tAB17CrQOroXX6/iEJKdgiEB5drz3Ww=="
+  "resolved" "https://registry.npmjs.org/@devoxa/prisma-relay-cursor-connection/-/prisma-relay-cursor-connection-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "graphql-fields" "^2.0.3"
+
 "@eslint/eslintrc@^1.2.1":
   "integrity" "sha512-bxvbYnBPN1Gibwyp6NrpnFzA3YtRL3BBAyEAFVIpNTm2Rn4Vy87GA5M4aSn3InRrlsbX5N0GW7XIx+U4SAEKdQ=="
   "resolved" "https://registry.npmjs.org/@eslint/eslintrc/-/eslintrc-1.2.1.tgz"
@@ -720,7 +727,7 @@
     "consola" "^2.15.0"
     "node-fetch" "^2.6.1"
 
-"@prisma/client@^3.12.0":
+"@prisma/client@^2.0.0 || ^3.0.0", "@prisma/client@^3.12.0":
   "integrity" "sha512-4NEQjUcWja/NVBvfuDFscWSk1/rXg3+wj+TSkqXCb1tKlx/bsUE00rxsvOvGg7VZ6lw1JFpGkwjwmsOIc4zvQw=="
   "resolved" "https://registry.npmjs.org/@prisma/client/-/client-3.12.0.tgz"
   "version" "3.12.0"
@@ -2621,6 +2628,11 @@
   "integrity" "sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA=="
   "resolved" "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.10.tgz"
   "version" "4.2.10"
+
+"graphql-fields@^2.0.3":
+  "integrity" "sha512-x3VE5lUcR4XCOxPIqaO4CE+bTK8u6gVouOdpQX9+EKHr+scqtK5Pp/l8nIGqIpN1TUlkKE6jDCCycm/WtLRAwA=="
+  "resolved" "https://registry.npmjs.org/graphql-fields/-/graphql-fields-2.0.3.tgz"
+  "version" "2.0.3"
 
 "has-flag@^3.0.0":
   "integrity" "sha1-tdRU3CGZriJWmfNGfloH87lVuv0="
