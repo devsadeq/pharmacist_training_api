@@ -8,127 +8,439 @@ datasource db {
 }
 
 model User {
-  id            String  @id @default(uuid())
-  name          String
-  email         String
-  password      String
-  phone         String?
-  country       String
-  status        Status  @default(pending)
-  identity_card Bytes?
+  id                String          @id @default(uuid())
+  name              String
+  email             String
+  avatar            String?         @unique
+  phone             String?
+  country           String
+  status            Status          @default(pending)
+  authentication    Authentication?
+  gander            Gander
+  createAt          DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  roles             Role[]
+  subscription      Subscription?
+  favorite_lectures Lecture[]
+  favorite_drugs    Drug[]
+  favorite_rxs      Rx[]
+  notifications     Notification[]
 
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  File File? @relation(fields: [avatar], references: [id])
 
-  role   Role   @relation(fields: [roleId], references: [id])
-  roleId String
+  created_roles Role[] @relation(name: "user_created_roles")
+  updated_roles Role[] @relation(name: "user_updated_roles")
 
-  plan   Plan   @relation(fields: [planId], references: [id])
-  planId String
+  created_plans Plan[] @relation(name: "user_created_plans")
+  updated_plans Plan[] @relation(name: "user_updated_plans")
 
-  notifications Notification[]
+  created_notifications Notification[] @relation(name: "user_created_notifications")
+  updated_notifications Notification[] @relation(name: "user_updated_notifications")
 
-  Favorites Favorites?
+  created_lectures Lecture[] @relation(name: "user_created_lectures")
+  updated_lectures Lecture[] @relation(name: "user_updated_lectures")
 
-  exam_enrollments ExamEnrollment[]
+  created_drugs Drug[] @relation(name: "user_created_drugs")
+  updated_drugs Drug[] @relation(name: "user_updated_drugs")
+
+  created_rxs Rx[] @relation(name: "user_created_rxs")
+  updated_rxs Rx[] @relation(name: "user_updated_rxs")
+
+  created_subscriptions Subscription[] @relation(name: "user_created_subscriptions")
+  updated_subscriptions Subscription[] @relation(name: "user_updated_subscriptions")
+
+  created_files File[] @relation(name: "user_created_files")
+  updated_files File[] @relation(name: "user_updated_files")
+
+  created_sources Source[] @relation(name: "user_created_sources")
+  updated_sources Source[] @relation(name: "user_updated_sources")
+
+  created_companies Company[] @relation(name: "user_created_companies")
+  updated_companies Company[] @relation(name: "user_updated_companies")
+
+  created_systems System[] @relation(name: "user_created_systems")
+  updated_systems System[] @relation(name: "user_updated_systems")
+
+  created_topics Topic[] @relation(name: "user_created_topics")
+  updated_topics Topic[] @relation(name: "user_updated_topics")
+
+  created_banners Banner[] @relation(name: "user_created_banners")
+  updated_banners Banner[] @relation(name: "user_updated_banners")
+
+  created_coupons Coupon[] @relation(name: "user_created_coupons")
+  updated_coupons Coupon[] @relation(name: "user_updated_coupons")
+
+  created_specialities Speciality[] @relation(name: "user_created_specialities")
+  updated_specialities Speciality[] @relation(name: "user_updated_specialities")
+
+  created_doctors Doctor[] @relation(name: "user_created_doctors")
+  updated_doctors Doctor[] @relation(name: "user_updated_doctors")
 
 
+  @@map("users")
 }
 
-model Role {
-  id   String @id @default(uuid())
-  name String @unique
+model Authentication {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  access_token    String
+  refresh_token   String
+  hashed_password String
+  ip_address      String?
+  createAt        DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("authentications")
+}
+
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdBy String
+  updatedBy String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  users     User[]
 
-  User User[]
+  creator User  @relation(name: "user_created_roles", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_roles", fields: [updatedBy], references: [id])
+
+  @@map("roles")
 }
 
 model Plan {
-  id   String @id @default(uuid())
-  name String @unique
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String
+  published     Boolean        @default(false)
+  benefits      String
+  featured      Boolean        @default(false)
+  period        Period         @default(lifetime)
+  price         Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     String
+  updatedBy     String?
+  subscriptions Subscription[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  creator User  @relation(name: "user_created_plans", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_plans", fields: [updatedBy], references: [id])
 
-  User User[]
+  @@map("plans")
 }
 
 model Notification {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  title     String
+  body      String?
+  url       String?
+  image     String?  @unique
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String?
+  users     User[]
 
-  User User[]
-}
+  creator User  @relation(name: "user_created_notifications", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_notifications", fields: [updatedBy], references: [id])
 
-model Favorites {
-  id String @id @default(uuid())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  File File? @relation(fields: [image], references: [id])
 }
 
 model Lecture {
-  id String @id @default(uuid())
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  content     Bytes
+  cover       String   @unique
+  images      File[]   @relation(name: "lecture_images")
+  published   Boolean  @default(false)
+  pdf_id      String?  @unique
+  topic_id    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String?
+  favoriteBy  User[]
+  drugs       Drug[]
+  sources     Source[]
+
+  creator User  @relation(name: "user_created_lectures", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_lectures", fields: [updatedBy], references: [id])
+
+  cover_file File  @relation(name: "lecture_cover", fields: [cover], references: [id])
+  pdf_file   File? @relation(name: "lecture_pdf", fields: [pdf_id], references: [id])
+  topic      Topic @relation(fields: [topic_id], references: [id])
 }
 
 model Source {
-  id String @id @default(uuid())
+  id        String    @id @default(uuid())
+  name      String    @unique
+  url       String?
+  picture   String?   @unique
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String?
+  lectures  Lecture[]
+
+  creator User  @relation(name: "user_created_sources", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_sources", fields: [updatedBy], references: [id])
+
+  File File? @relation(fields: [picture], references: [id])
 }
 
 model Rx {
-  id String @id @default(uuid())
+  id             String        @id @default(uuid())
+  picture        String        @unique
+  readable_level ReadableLevel @default(easy)
+  hand_written   Boolean       @default(true)
+  published      Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  favorite_by    User[]
+  createdBy      String
+  updatedBy      String?
+  specialities   Speciality[]
+  drugs          Drug[]
+  systems        System[]
+
+  creator User  @relation(name: "user_created_rxs", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_rxs", fields: [updatedBy], references: [id])
+
+  File File @relation(fields: [picture], references: [id])
 }
 
 model Drug {
-  id String @id @default(uuid())
+  id              String         @id @default(uuid())
+  name            String         @unique
+  description     String?
+  brand_name      String
+  other_names     String[]
+  mechanism       String?
+  dosage          String?
+  otc             Boolean        @default(false)
+  pregnancy_group PregnancyGroup @default(unknown)
+  handout         String?
+  pictures        File[]
+  published       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  createdBy       String
+  updatedBy       String?
+  lectures        Lecture[]
+  rxs             Rx[]
+  companies       Company[]
+  favorite_by     User[]
+
+
+  creator User  @relation(name: "user_created_drugs", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_drugs", fields: [updatedBy], references: [id])
+
 }
 
 model Company {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  name      String   @unique
+  logo      String?  @unique
+  country   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String?
+  drugs     Drug[]
+
+  creator User  @relation(name: "user_created_companies", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_companies", fields: [updatedBy], references: [id])
+
+  File File? @relation(fields: [logo], references: [id])
 }
 
 model System {
-  id String @id @default(uuid())
+  id          String   @id @default(uuid())
+  name        String   @unique
+  cover       String?  @unique
+  description String?
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String?
+  rxs         Rx[]
+  topics      Topic[]
+
+
+  creator User  @relation(name: "user_created_systems", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_systems", fields: [updatedBy], references: [id])
+
+  File File? @relation(fields: [cover], references: [id])
+
 }
 
 model Topic {
-  id String @id @default(uuid())
-}
+  id                 String    @id @default(uuid())
+  name               String    @unique
+  description        String?
+  cover              String?   @unique
+  published          Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  createdBy          String
+  updatedBy          String?
+  lectures           Lecture[]
+  system_id          String
+  subtopics          Topic[]   @relation("topic_subtopics")
+  subtopics_relation Topic[]   @relation("topic_subtopics") //ignore that 
 
-model SubTopic {
-  id String @id @default(uuid())
+  creator User   @relation(name: "user_created_topics", fields: [createdBy], references: [id])
+  updater User?  @relation(name: "user_updated_topics", fields: [updatedBy], references: [id])
+  File    File?  @relation(fields: [cover], references: [id])
+  system  System @relation(fields: [system_id], references: [id])
+  @@map("topics")
 }
 
 model Banner {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  image_id  String   @unique
+  url       String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String?
+
+  creator User  @relation(name: "user_created_banners", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_banners", fields: [updatedBy], references: [id])
+
+  File File @relation(fields: [image_id], references: [id])
+  @@map("banners")
 }
 
 model Coupon {
-  id String @id @default(uuid())
+  id         String       @id @default(uuid())
+  name       String       @unique
+  code       String       @unique
+  discount   Int
+  published  Boolean      @default(false)
+  start_date DateTime
+  end_date   DateTime
+  type       CouponType   @default(percentage)
+  max_amount Int?
+  max_uses   Int?
+  status     CouponStatus @default(active)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  createdBy  String
+  updatedBy  String?
+
+  creator User  @relation(name: "user_created_coupons", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_coupons", fields: [updatedBy], references: [id])
+  @@map("coupons")
 }
 
-model Exam {
-  id String @id @default(uuid())
+model Subscription {
+  id         String             @id @default(uuid())
+  userId     String             @unique
+  planId     String?
+  started_at DateTime
+  expired_at DateTime
+  coupon_id  String?
+  payment_id String?
+  status     SubscriptionStatus @default(active)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  createdBy  String
+  updatedBy  String?
+
+  creator User  @relation(name: "user_created_subscriptions", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_subscriptions", fields: [updatedBy], references: [id])
+  User    User  @relation(fields: [userId], references: [id])
+  Plan    Plan? @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
 }
 
-model Question {
-  id String @id @default(uuid())
+model Speciality {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  cover_id  String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String?
+  rxs       Rx[]
+  doctors   Doctor[]
+
+  creator User  @relation(name: "user_created_specialities", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_specialities", fields: [updatedBy], references: [id])
+
+  File File? @relation(fields: [cover_id], references: [id])
+
+  @@map("specialities")
 }
 
-model Option {
-  id String @id @default(uuid())
+model Doctor {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  avatar_id     String?  @unique
+  phone_numbers String[]
+  speciality_id String
+  location      String?
+  country       String?
+  city          String?
+  gps_location  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     String
+  updatedBy     String?
+
+
+  creator    User       @relation(name: "user_created_doctors", fields: [createdBy], references: [id])
+  updater    User?      @relation(name: "user_updated_doctors", fields: [updatedBy], references: [id])
+  speciality Speciality @relation(fields: [speciality_id], references: [id])
+  File       File?      @relation(fields: [avatar_id], references: [id])
+  @@map("doctors")
 }
 
-model TakenAnswer {
-  id String @id @default(uuid())
-}
+model File {
+  id           String   @id @default(uuid())
+  filename     String   @unique
+  fieldname    String
+  originalname String
+  path         String   @unique
+  size         Float
+  mimetype     String
+  encoding     String
+  destination  String
+  url          String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    String
+  updatedBy    String?
 
-model ExamEnrollment {
-  id String @id @default(uuid())
+  creator User  @relation(name: "user_created_files", fields: [createdBy], references: [id])
+  updater User? @relation(name: "user_updated_files", fields: [updatedBy], references: [id])
 
-  User   User   @relation(fields: [userId], references: [id])
-  userId String
+  Doctor       Doctor?
+  Speciality   Speciality?
+  Banner       Banner?
+  Topic        Topic?
+  System       System?
+  Company      Company?
+  Drug         Drug[]
+  Rx           Rx?
+  Source       Source?
+  LectureImage Lecture[]     @relation(name: "lecture_images")
+  LectureCover Lecture?      @relation(name: "lecture_cover")
+  LecturePdf   Lecture?      @relation(name: "lecture_pdf")
+  Notification Notification?
+  User         User?
 }
 
 enum Status {
@@ -136,4 +448,47 @@ enum Status {
   pending
   banned
   rejected
+}
+
+enum SubscriptionStatus {
+  active
+  expired
+  canceled
+}
+
+enum ReadableLevel {
+  easy
+  medium
+  hard
+}
+
+enum PregnancyGroup {
+  A
+  B
+  C
+  D
+  X
+  unknown
+}
+
+enum CouponType {
+  percentage
+  amount
+}
+
+enum CouponStatus {
+  active
+  expired
+  canceled
+}
+
+enum Gander {
+  male
+  female
+}
+
+enum Period {
+  monthly
+  yearly
+  lifetime
 }
